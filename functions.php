@@ -139,16 +139,38 @@ genesis_register_sidebar( array(
 	'description' => __( 'This is the bottom section of the Home page.', 'education' ),
 ) );
 
+//* Register Alt Home widget areas
+genesis_register_sidebar( array(
+	'id'          => 'homealt-featured',
+	'name'        => __( 'Home Alt - Featured', 'education' ),
+	'description' => __( 'This is the featured section of the homealt page.', 'education' ),
+) );
+genesis_register_sidebar( array(
+	'id'          => 'homealt-top',
+	'name'        => __( 'Home Alt - Top', 'education' ),
+	'description' => __( 'This is the top section of the homealt page.', 'education' ),
+) );
+genesis_register_sidebar( array(
+	'id'          => 'homealt-middle',
+	'name'        => __( 'Home Alt - Middle', 'education' ),
+	'description' => __( 'This is the middle section of the homealt page.', 'education' ),
+) );
+genesis_register_sidebar( array(
+	'id'          => 'homealt-bottom',
+	'name'        => __( 'Home Alt - Bottom', 'education' ),
+	'description' => __( 'This is the bottom section of the homealt page.', 'education' ),
+) );
+
 // Show Footer Widget Areas only on homepage
-add_action( 'genesis_after_content_sidebar_wrap', 'sk_footer_widget_areas' );
-function sk_footer_widget_areas() {
-
-	if ( is_home() || is_front_page() )
-		return;
-
-	remove_action( 'genesis_before_footer', 'genesis_footer_widget_areas' );
-
-}
+//add_action( 'genesis_after_content_sidebar_wrap', 'sk_footer_widget_areas' );
+//function sk_footer_widget_areas() {
+//
+//	if ( is_home() || is_front_page() )
+//		return;
+//
+//	remove_action( 'genesis_before_footer', 'genesis_footer_widget_areas' );
+//
+//}
 
 /** Register Utility Bar Widget Areas. */
 
@@ -292,3 +314,123 @@ add_filter( 'genesis_search_button_text', 'sp_search_button_text' );
 function sp_search_button_text( $text ) {
 	return esc_attr( 'Go' );
 }
+
+//* Modify the Genesis content limit read more link
+add_filter( 'get_the_content_more_link', 'sp_read_more_link' );
+function sp_read_more_link() {
+	return '... <a class="more-link" href="' . get_permalink() . '">Learn More</a>';
+}
+
+# Reposition the breadcrumb
+remove_action( 'genesis_before_loop', 'genesis_do_breadcrumbs' );
+add_action( 'genesis_after_header', 'genesis_do_breadcrumbs', 7 );
+
+//* Reposition custom headline and / or description to category / tag / taxonomy archive pages.
+//		remove_action( 'genesis_entry_header', 'genesis_entry_header_markup_open', 5 );
+//		remove_action( 'genesis_entry_header', 'genesis_do_post_title' );
+//		remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
+//		remove_action( 'genesis_entry_header', 'genesis_entry_header_markup_close', 15 );
+//		add_action( 'genesis_before_content', 'genesis_do_post_title', 9 );
+//		add_action( 'genesis_before_content', 'genesis_post_info', 9 );
+//add_action( 'genesis_before_content', 'genesis_post', 15 );
+
+# Allow multiple instances of Genesis Responsive Slider
+add_action ('wp', 'lit_custom_slide_show');
+
+function lit_custom_slide_show() {
+	if(is_home()){
+		$category_prefix = ""; // Home page needs no prefix
+	} else {
+		$category_prefix = basename(get_permalink()).'-' ; // this results in ‘about-‘ for a page called “about”
+		}
+		$my_posts_term = 'category_name,'.$category_prefix.'featured'; // Prefix matches category used for home page
+			$slide_show_vars = array(
+				'post_type' => 'post',
+				'posts_term' => $my_posts_term
+				);
+foreach ($slide_show_vars as $option => $value)
+        add_filter ("genesis_pre_get_option_{$option}", create_function ('', "return '{$value}';"));
+}
+
+//* Display Parent and Child Page Titles on Page
+//add_filter( 'genesis_post_title_output', 'lit_post_title_output', 15 );
+//function lit_post_title_output( $title ) {
+ 
+//    global $post;
+	
+//    if ( is_page() && $post->post_parent > 0 ) {
+	
+//        $parent_title = get_the_title( $post->post_parent );
+//        $page_title = get_the_title();
+//        $title = sprintf( '<h1 class="parent-title">%s</h1><h2 class="entry-title">%s</h2>', $parent_title, $page_title );
+//    }
+//    return $title;
+//}
+
+//* Display Parent and Child Page Titles on Page
+//add_filter( 'genesis_post_title_output', 'lit_post_title_output', 13 );
+//function lit_post_title_output( $title ) {
+ 
+//    global $post;
+			
+//if ( is_page( array ('northeast', 'northwest', 'south-central', 'south', 'southwest', 'west' ))) { 
+//	        $parent_title = get_the_title( $post->post_parent );
+//	        $page_title = get_the_title();
+//	        $title = sprintf( '<h1 class="parent-title">%s</h1>', $page_title );
+	
+//    }
+//    return $title;	    
+//}
+
+//* Display Parent and Child Page Titles on Page
+add_filter( 'genesis_post_title_output', 'lit_post_title_output', 13 );
+function lit_post_title_output( $title ) {
+ 
+    global $post;
+			
+if($post->ancestors)
+	{
+		$ancestors = end($post->ancestors);
+		$parent_title = get_the_title( $post->post_parent );
+	    $page_title = get_the_title();
+	    $title = sprintf( '<h1 class="parent-title">%s</h1><h2 class="entry-title">%s</h2>', $parent_title, $page_title );
+		
+	}	
+    return $title;	    
+}
+
+//* Customize the post info function
+add_filter( 'genesis_post_info', 'sp_post_info_filter' );
+function sp_post_info_filter($post_info) {
+if ( !is_page() ) {
+	$post_info = '';
+	return $post_info;
+}}
+
+add_action( 'init', 'sample_remove_entry_meta', 11 );
+/**
+ * Remove entry meta for post types
+ * 
+ * @link https://gist.github.com/nathanrice/03a5871e5e5a27f22747
+ */
+function sample_remove_entry_meta() {
+	remove_post_type_support( 'post', 'genesis-entry-meta-before-content' );
+	remove_post_type_support( 'post', 'genesis-entry-meta-after-content' );
+}
+
+//* Display Parent and Child Page Titles on Page
+//add_filter( 'genesis_post_title_output', 'lit_post_title_output2', 15 );
+//function lit_post_title_output2( $title ) {
+ 
+//    global $post;
+			
+//if ( is_page( 'residencies' ) || '19' == $post->post_parent > 0 ) { 
+//	        $parent_title = get_the_title( $post->post_parent );
+//	        $page_title = get_the_title();
+//	        $title = sprintf( '<h1 class="parent-title">%s</h1><h2 class="entry-title">%s</h2>', $parent_title, $page_title );
+	
+//    }
+//    return $title;	    
+//}
+
+//if ( is_page('americas') || $post->post_parent == '2348' || ($post->ancestors && in_array( '2348', $post->ancestors) ) ) {
