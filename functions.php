@@ -9,7 +9,7 @@ include_once( get_stylesheet_directory() . '/lib/theme-defaults.php' );
 load_child_theme_textdomain( 'education', apply_filters( 'child_theme_textdomain', get_stylesheet_directory() . '/languages', 'education' ) );
 
 //* Child theme (do not remove)
-define( 'CHILD_THEME_NAME', __( 'Education Pro Theme', 'education' ) );
+define( 'CHILD_THEME_NAME', __( 'UAMS Pro Theme', 'education' ) );
 define( 'CHILD_THEME_URL', 'http://my.studiopress.com/themes/education/' );
 define( 'CHILD_THEME_VERSION', '3.0.0' );
 

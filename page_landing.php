@@ -1,6 +1,6 @@
 <?php
 /**
- * This file adds the Landing template to the Education Pro Theme.
+ * This file adds the Landing template to the UAMS Pro Theme.
  *
  * @author StudioPress
  * @package Education Pro

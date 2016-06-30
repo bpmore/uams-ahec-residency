@@ -1,6 +1,6 @@
 <?php
 /**
- * This file adds the Home Page to the Education Pro Theme.
+ * This file adds the Home Page to the UAMS Pro Theme.
  *
  * @author StudioPress
  * @package Education Pro
